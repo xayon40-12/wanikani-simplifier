@@ -1,0 +1,16 @@
+# Novels directory (contains copyrighted raw and simplified texts)
+novels/
+
+# WaniKani local cache and dynamically fetched list
+subjects_cache.json
+kanji_list.txt
+
+# API Tokens / Secrets
+token.txt
+.env
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
