@@ -41,9 +41,24 @@ This project has **zero external dependencies** and runs out-of-the-box on stand
    ```
 
 3. **Custom Kanji Lists (Optional)**:
-   If you know kanji from outside WaniKani (e.g., `魔` which is extremely common in fantasy web novels), you can add them to these files:
-   * **`custom_known_kanji.txt`**: Add kanji you know (one per line).
-   * **`custom_mastered_kanji.txt`**: Add kanji you have fully mastered (one per line). Mastered kanji will not be flagged as needing ruby tags.
+   To version your personal custom kanji list without cluttering the main branch, this project checks out a separate branch (`personal-configs`) into a git-ignored subfolder `.configs/` using Git worktrees.
+   * **Setup**:
+     Run this command in the project root to set up the worktree:
+     ```bash
+     git worktree add .configs personal-configs
+     ```
+   * **Usage**:
+     Manage your custom lists inside the `.configs/` folder:
+     * **`.configs/custom_known_kanji.txt`**: Add kanji you know from outside WaniKani (one per line).
+     * **`.configs/custom_mastered_kanji.txt`**: Add kanji you have fully mastered (one per line).
+   * **Saving Changes**:
+     To commit and push updates to your personal kanji list, change into the subfolder and commit there:
+     ```bash
+     cd .configs
+     git add . && git commit -m "Update personal kanji list"
+     git push origin personal-configs
+     ```
+     *(Note: If you do not use the worktree setup, the scripts will fall back to reading `custom_known_kanji.txt` in the root folder).*
 
 ---
 

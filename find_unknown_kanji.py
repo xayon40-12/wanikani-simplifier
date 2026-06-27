@@ -4,11 +4,14 @@ import os
 import re
 import subprocess
 
+# Standard WaniKani generated files
 KANJI_LIST_FILE = "kanji_list.txt"
 MASTERED_FILE = "mastered_kanji.txt"
-CUSTOM_KNOWN_FILE = "custom_known_kanji.txt"
-CUSTOM_MASTERED_FILE = "custom_mastered_kanji.txt"
 FETCH_KANJI_SCRIPT = "fetch_kanji.py"
+
+# Search paths for custom files (prefers .configs/ worktree folder, falls back to root)
+CUSTOM_KNOWN_PATHS = [".configs/custom_known_kanji.txt", "custom_known_kanji.txt"]
+CUSTOM_MASTERED_PATHS = [".configs/custom_mastered_kanji.txt", "custom_mastered_kanji.txt"]
 
 def update_kanji_list():
     print("Updating known kanji list from WaniKani...")
@@ -33,11 +36,17 @@ def load_kanji_list(filepath):
             line_str = line.strip()
             # Ignore empty lines and comment lines
             if line_str and not line_str.startswith("#"):
-                # Take only the first character (in case of side comments)
                 char = line_str[0]
                 if is_kanji(char):
                     known.add(char)
     return known
+
+def load_kanji_list_from_paths(paths):
+    for path in paths:
+        if os.path.exists(path):
+            print(f"Loading custom list from {path}...")
+            return load_kanji_list(path)
+    return set()
 
 def is_kanji(char):
     # Standard Japanese Kanji range (CJK Unified Ideographs)
@@ -108,15 +117,15 @@ def main():
     # 1. Update the known kanji list
     update_kanji_list()
     
-    # 2. Load lists
+    # 2. Load WaniKani lists
     known_kanji = load_kanji_list(KANJI_LIST_FILE)
     mastered_kanji = load_kanji_list(MASTERED_FILE)
     
     # Load custom lists
-    custom_known = load_kanji_list(CUSTOM_KNOWN_FILE)
-    custom_mastered = load_kanji_list(CUSTOM_MASTERED_FILE)
+    custom_known = load_kanji_list_from_paths(CUSTOM_KNOWN_PATHS)
+    custom_mastered = load_kanji_list_from_paths(CUSTOM_MASTERED_PATHS)
     
-    # Merge
+    # Merge custom lists into known sets
     known_kanji.update(custom_known)
     mastered_kanji.update(custom_mastered)
     

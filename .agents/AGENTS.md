@@ -8,7 +8,7 @@ When the user asks to "rewrite a novel chapter using only known kanji", follow t
 
 1. **Setup and Known Kanji Fetch**:
    - Run `./fetch_kanji.py` to ensure the known kanji list (`kanji_list.txt`) and mastered kanji list (`mastered_kanji.txt`) are updated with the user's latest WaniKani progress.
-   - Read the known kanji list from `kanji_list.txt` and mastered kanji list from `mastered_kanji.txt`. Also load custom known kanji from `custom_known_kanji.txt` (if present) and custom mastered kanji from `custom_mastered_kanji.txt` (if present), merging them into the known and mastered sets.
+   - Read the known kanji list from `kanji_list.txt` and mastered kanji list from `mastered_kanji.txt`. Also load custom known kanji from `custom_known_kanji.txt` (if present, checking `.configs/` folder first) and custom mastered kanji from `custom_mastered_kanji.txt` (if present, checking `.configs/` folder first), merging them into the known and mastered sets.
 
 2. **Source Reading**:
    - Locate the raw downloaded chapter file at `novels/{ncode}_{title}/raw/{chapter}.md`.
