@@ -81,13 +81,14 @@ Simply open this workspace and prompt the assistant:
 > *"Please rewrite chapter 1 of n2267be to only use known kanji."*
 
 The AI assistant will automatically read the instructions in **[.agents/AGENTS.md](file:///.agents/AGENTS.md)** and execute the following loop:
-1. Sync your WaniKani kanji list.
+1. Sync your WaniKani kanji lists (`kanji_list.txt` and `mastered_kanji.txt`).
 2. Read the raw text.
 3. Draft a rewrite substituting unknown kanji with known synonyms or natural phrasings.
-4. Run `./find_unknown_kanji.py` to identify remaining issues.
-5. Correct the text and re-validate until it reaches `0 unknown kanji`.
-6. Run a **self-peer-review** to restore key quotes in kana or optimize flow.
-7. Save the finalized file to `novels/{ncode}_{title}/simplified/{chapter}.md`.
+4. Apply **Furigana (Ruby tags)** to any kanji present in the text that you have unlocked but **not yet Guru 2** (meaning it exists in `kanji_list.txt` but not in `mastered_kanji.txt`). Mastered kanji (Guru 2+) remain raw, avoiding reading clutter.
+5. Run `./find_unknown_kanji.py` to identify remaining issues.
+6. Correct the text and re-validate until it reaches `0 unknown kanji`.
+7. Run a **self-peer-review** to restore key quotes in kana or optimize flow.
+8. Save the finalized file to `novels/{ncode}_{title}/simplified/{chapter}.md`.
 
 ---
 

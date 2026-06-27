@@ -4,6 +4,7 @@ novels/
 # WaniKani local cache and dynamically fetched list
 subjects_cache.json
 kanji_list.txt
+mastered_kanji.txt
 
 # API Tokens / Secrets
 token.txt

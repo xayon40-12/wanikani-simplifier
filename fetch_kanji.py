@@ -8,6 +8,7 @@ import time
 
 SUBJECTS_CACHE = "subjects_cache.json"
 OUTPUT_FILE = "kanji_list.txt"
+MASTERED_FILE = "mastered_kanji.txt"
 TOKEN_FILE = "token.txt"
 API_URL = "https://api.wanikani.com/v2/subjects?types=kanji"
 
@@ -75,8 +76,8 @@ def get_subjects(api_token, force_refresh=False):
     return subjects
 
 def fetch_kanji_assignments(api_token):
-    assigned_subject_ids = []
-    # Apprentice 3 is SRS Stage 3. "At least Apprentice 3" means stages 3, 4, 5, 6, 7, 8, 9
+    assignments = {} # subject_id -> srs_stage
+    # Apprentice 3 is SRS Stage 3. We fetch stages 3, 4, 5, 6, 7, 8, 9
     url = "https://api.wanikani.com/v2/assignments?subject_types=kanji&srs_stages=3,4,5,6,7,8,9"
     page = 1
     print("Fetching kanji assignments (at least Apprentice 3) from API...")
@@ -90,9 +91,11 @@ def fetch_kanji_assignments(api_token):
             with urllib.request.urlopen(req) as response:
                 data = json.loads(response.read().decode('utf-8'))
                 for item in data.get("data", []):
-                    sub_id = str(item.get("data", {}).get("subject_id"))
-                    if sub_id:
-                        assigned_subject_ids.append(sub_id)
+                    item_data = item.get("data", {})
+                    sub_id = str(item_data.get("subject_id"))
+                    stage = item_data.get("srs_stage")
+                    if sub_id and stage is not None:
+                        assignments[sub_id] = stage
                 url = data.get("pages", {}).get("next_url")
                 page += 1
                 time.sleep(0.1)
@@ -103,8 +106,18 @@ def fetch_kanji_assignments(api_token):
             print(f"Error fetching assignments: {e}")
             break
             
-    print(f"Found {len(assigned_subject_ids)} assignments matching criteria.")
-    return assigned_subject_ids
+    print(f"Found {len(assignments)} assignments matching criteria.")
+    return assignments
+
+def save_to_file(kanji_list, filepath):
+    try:
+        with open(filepath, "w", encoding="utf-8") as f:
+            for char in kanji_list:
+                f.write(f"{char}\n")
+        print(f"Saved list to {filepath}")
+    except Exception as e:
+        print(f"Error writing to {filepath}: {e}")
+        sys.exit(1)
 
 def main():
     token = get_api_token()
@@ -129,26 +142,25 @@ def main():
         print("Error: Could not load WaniKani subjects.")
         sys.exit(1)
         
-    assigned_ids = fetch_kanji_assignments(token)
+    assignments = fetch_kanji_assignments(token)
     
-    # Map assignment IDs to characters
-    matched_kanji = []
-    for sub_id in assigned_ids:
+    # Map assignment IDs to characters and split into known (stages 3-9) and mastered (stages 6-9)
+    known_kanji = []
+    mastered_kanji = []
+    
+    for sub_id, stage in assignments.items():
         char = subjects.get(sub_id)
         if char:
-            matched_kanji.append(char)
+            known_kanji.append(char)
+            if stage >= 6: # Guru 2 or higher
+                mastered_kanji.append(char)
         else:
             print(f"Warning: Subject ID {sub_id} not found in subjects cache.")
             
-    # Save to file
-    try:
-        with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-            for char in matched_kanji:
-                f.write(f"{char}\n")
-        print(f"Saved {len(matched_kanji)} kanji characters to {OUTPUT_FILE}")
-    except Exception as e:
-        print(f"Error writing output file: {e}")
-        sys.exit(1)
+    # Save both lists
+    save_to_file(known_kanji, OUTPUT_FILE)
+    save_to_file(mastered_kanji, MASTERED_FILE)
+    print(f"Done! {len(known_kanji)} known kanji total, {len(mastered_kanji)} are Guru 2+.")
 
 if __name__ == "__main__":
     main()
