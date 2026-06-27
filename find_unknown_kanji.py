@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 import sys
 import os
+import re
 import subprocess
 
 KANJI_LIST_FILE = "kanji_list.txt"
+MASTERED_FILE = "mastered_kanji.txt"
 FETCH_KANJI_SCRIPT = "fetch_kanji.py"
 
 def update_kanji_list():
@@ -20,41 +22,75 @@ def update_kanji_list():
         print(f"Error running {FETCH_KANJI_SCRIPT}: {e}")
         sys.exit(1)
 
-def load_known_kanji():
-    if not os.path.exists(KANJI_LIST_FILE):
-        print(f"Error: {KANJI_LIST_FILE} not found after update attempt.")
-        sys.exit(1)
-        
+def load_kanji_list(filepath):
+    if not os.path.exists(filepath):
+        return set()
     known = set()
-    with open(KANJI_LIST_FILE, "r", encoding="utf-8") as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         for line in f:
             char = line.strip()
             if char:
                 known.add(char)
-    print(f"Loaded {len(known)} known kanji from {KANJI_LIST_FILE}.")
     return known
 
 def is_kanji(char):
     # Standard Japanese Kanji range (CJK Unified Ideographs)
     return '\u4e00' <= char <= '\u9fff'
 
-def analyze_file(filepath, known_kanji):
+def offset_to_line_col(content, offset):
+    before = content[:offset]
+    lines = before.split("\n")
+    line_num = len(lines)
+    col_num = len(lines[-1]) + 1
+    return line_num, col_num
+
+def analyze_file(filepath, known_kanji, mastered_kanji):
     if not os.path.exists(filepath):
         print(f"Error: Target file {filepath} not found.")
         sys.exit(1)
         
-    unknown_occurrences = []
-    unique_unknown = set()
-    
-    print(f"Analyzing {filepath} for unknown kanji...")
     with open(filepath, "r", encoding="utf-8") as f:
-        for line_num, line in enumerate(f, 1):
-            for char_num, char in enumerate(line, 1):
-                if is_kanji(char) and char not in known_kanji:
-                    unknown_occurrences.append((line_num, char_num, char))
-                    unique_unknown.add(char)
-                    
-    return unknown_occurrences, unique_unknown
+        content = f.read()
+        
+    errors = []
+    unmastered = known_kanji - mastered_kanji
+    
+    # 1. Parse ruby blocks: <ruby>KANJI<rt>READING</rt></ruby>
+    ruby_pattern = re.compile(r'<ruby>(?P<kanji>[^<]+)<rt>(?P<reading>[^<]+)</rt></ruby>')
+    ruby_intervals = []
+    
+    for match in ruby_pattern.finditer(content):
+        start, end = match.span()
+        ruby_intervals.append((start, end))
+        kanji_str = match.group("kanji")
+        
+        # Check if the kanji inside the ruby block are known at all
+        for char in kanji_str:
+            if is_kanji(char) and char not in known_kanji:
+                char_offset = start + content[start:end].find(char)
+                line, col = offset_to_line_col(content, char_offset)
+                errors.append((line, col, char, "Unknown kanji inside ruby tag"))
+
+    def is_inside_ruby(offset):
+        for start, end in ruby_intervals:
+            if start <= offset < end:
+                return True
+        return False
+
+    # 2. Check all characters in the text
+    for offset, char in enumerate(content):
+        if is_inside_ruby(offset):
+            continue
+            
+        if is_kanji(char):
+            line, col = offset_to_line_col(content, offset)
+            if char not in known_kanji:
+                errors.append((line, col, char, "Unknown kanji"))
+            elif mastered_kanji and char in unmastered:
+                errors.append((line, col, char, "Unmastered kanji missing <ruby> tags"))
+                
+    errors.sort()
+    return errors
 
 def main():
     if len(sys.argv) < 2:
@@ -66,22 +102,39 @@ def main():
     # 1. Update the known kanji list
     update_kanji_list()
     
-    # 2. Load the known kanji
-    known_kanji = load_known_kanji()
+    # 2. Load lists
+    known_kanji = load_kanji_list(KANJI_LIST_FILE)
+    mastered_kanji = load_kanji_list(MASTERED_FILE)
     
+    if not known_kanji:
+        print(f"Error: Could not load {KANJI_LIST_FILE}.")
+        sys.exit(1)
+        
+    if not mastered_kanji:
+        print("Warning: mastered_kanji.txt not found. Skipping ruby tag verification.")
+        
     # 3. Analyze target file
-    occurrences, unique = analyze_file(target_file, known_kanji)
+    errors = analyze_file(target_file, known_kanji, mastered_kanji)
     
-    print("\n" + "=" * 40)
+    print("\n" + "=" * 50)
     print(f"RESULTS FOR: {target_file}")
-    print(f"Found {len(occurrences)} unknown kanji occurrences ({len(unique)} unique characters).")
-    print("=" * 40)
+    print("=" * 50)
     
-    if occurrences:
-        for line, col, char in occurrences:
-            print(f"Line {line:3d}, Column {col:2d}: {char}")
+    if errors:
+        unknown_count = sum(1 for e in errors if "Unknown" in e[3])
+        missing_ruby_count = sum(1 for e in errors if "missing" in e[3])
+        
+        print(f"Found {len(errors)} issues:")
+        if unknown_count:
+            print(f"  - {unknown_count} unknown kanji")
+        if missing_ruby_count:
+            print(f"  - {missing_ruby_count} unmastered kanji missing <ruby> tags")
+        print("-" * 50)
+        
+        for line, col, char, message in errors:
+            print(f"Line {line:3d}, Column {col:2d}: {char} -> {message}")
     else:
-        print("All kanji in this file are in your known list!")
+        print("All kanji in this file are in your known list, and unmastered ones have ruby tags!")
 
 if __name__ == "__main__":
     main()
