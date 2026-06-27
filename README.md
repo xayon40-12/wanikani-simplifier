@@ -51,14 +51,14 @@ To download a chapter from Syosetu.com, use `fetch_syosetu.py`. You can provide 
 # Example: Download Re:Zero Chapter 1
 ./fetch_syosetu.py https://ncode.syosetu.com/n2267be/ 1
 ```
-* **Output Path**: `novels/n2267be_Ｒｅ：ゼロから始める異世界生活/raw/1.txt`
+* **Output Path**: `novels/n2267be_Ｒｅ：ゼロから始める異世界生活/raw/1.md`
 * *Tip*: Pass the `--keep-ruby` flag if you want to keep furigana readings formatted as `漢字(かんじ)`. By default, furigana is stripped.
 
 ### Step 2: Validate Against Your Kanji List
 Run the checker script `find_unknown_kanji.py` on the downloaded file. It will automatically update your known kanji list from WaniKani (saving them to `kanji_list.txt`) and scan the file.
 
 ```bash
-./find_unknown_kanji.py novels/n2267be_Ｒｅ：ゼロから始める異世界生活/raw/1.txt
+./find_unknown_kanji.py novels/n2267be_Ｒｅ：ゼロから始める異世界生活/raw/1.md
 ```
 * **Output**: A list of all unknown kanji characters found in the text, indicating their exact line and character column numbers.
 
@@ -67,7 +67,7 @@ Write your simplified chapter and save it under the `simplified/` folder. Use sy
 
 Verify the rewritten file:
 ```bash
-./find_unknown_kanji.py novels/n2267be_Ｒｅ：ゼロから始める異世界生活/simplified/1.txt
+./find_unknown_kanji.py novels/n2267be_Ｒｅ：ゼロから始める異世界生活/simplified/1.md
 ```
 Repeat until it reports **`0 unknown kanji`**!
 
@@ -87,7 +87,7 @@ The AI assistant will automatically read the instructions in **[.agents/AGENTS.m
 4. Run `./find_unknown_kanji.py` to identify remaining issues.
 5. Correct the text and re-validate until it reaches `0 unknown kanji`.
 6. Run a **self-peer-review** to restore key quotes in kana or optimize flow.
-7. Save the finalized file to `novels/{ncode}_{title}/simplified/{chapter}.txt`.
+7. Save the finalized file to `novels/{ncode}_{title}/simplified/{chapter}.md`.
 
 ---
 

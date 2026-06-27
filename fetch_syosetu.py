@@ -153,11 +153,11 @@ def download_chapter(domain, ncode, chapter=None, keep_ruby=False):
     if chapter:
         output_dir = os.path.join("novels", novel_folder_name, "raw")
         os.makedirs(output_dir, exist_ok=True)
-        output_filename = os.path.join(output_dir, f"{chapter}.txt")
+        output_filename = os.path.join(output_dir, f"{chapter}.md")
     else:
         output_dir = os.path.join("novels", novel_folder_name)
         os.makedirs(output_dir, exist_ok=True)
-        output_filename = os.path.join(output_dir, "main.txt")
+        output_filename = os.path.join(output_dir, "main.md")
         
     if not paragraphs:
         print("Warning: No chapter text found. The page might be an index page or structured differently.")
