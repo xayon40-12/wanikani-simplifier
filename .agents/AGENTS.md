@@ -26,7 +26,13 @@ When the user asks to "rewrite a novel chapter using only known kanji", follow t
      - If the checker finds unknown kanji, extract their locations and the kanji characters. Rewrite the specific lines in the draft to eliminate them, overwrite the draft file, and re-run the checker.
      - Repeat this verification loop until the validator returns no unknown kanji.
 
-4. **Saving the Final Chapter**:
+4. **Peer Review & Final Polish**:
+   - Once the draft is validated (0 unknown kanji), perform a thorough self-peer review of the translation.
+   - **Verification**: Check if the simplified phrasing is natural, grammatically correct, and preserves the dramatic weight of the original.
+   - **Optimization**: Check if any simplified words can be restored to more accurate synonyms or exact phrases by writing them in hiragana (e.g., using `すくう` instead of `守る` for `救う` if the context warrants it) or by using newly unlocked known kanji (e.g., check for kanji that are in `kanji_list.txt` but might have been missed in initial drafts, such as `違`).
+   - If any quality improvements are found, apply them to the draft immediately and run `./find_unknown_kanji.py` one final time to verify it remains at 0 unknown kanji. Do not wait for the user to prompt you for these changes; execute them proactively.
+
+5. **Saving the Final Chapter**:
    - Move or save the verified clean text to `novels/{ncode}_{title}/simplified/{chapter}.txt`.
    - Remove any temporary draft files.
-   - Report the completion to the user, highlighting any major phrasing compromises made to fit their vocabulary.
+   - Report the completion to the user, highlighting the major phrasing choices, synonyms used, and peer-review improvements made.
