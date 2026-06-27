@@ -6,6 +6,8 @@ import subprocess
 
 KANJI_LIST_FILE = "kanji_list.txt"
 MASTERED_FILE = "mastered_kanji.txt"
+CUSTOM_KNOWN_FILE = "custom_known_kanji.txt"
+CUSTOM_MASTERED_FILE = "custom_mastered_kanji.txt"
 FETCH_KANJI_SCRIPT = "fetch_kanji.py"
 
 def update_kanji_list():
@@ -28,9 +30,13 @@ def load_kanji_list(filepath):
     known = set()
     with open(filepath, "r", encoding="utf-8") as f:
         for line in f:
-            char = line.strip()
-            if char:
-                known.add(char)
+            line_str = line.strip()
+            # Ignore empty lines and comment lines
+            if line_str and not line_str.startswith("#"):
+                # Take only the first character (in case of side comments)
+                char = line_str[0]
+                if is_kanji(char):
+                    known.add(char)
     return known
 
 def is_kanji(char):
@@ -105,6 +111,14 @@ def main():
     # 2. Load lists
     known_kanji = load_kanji_list(KANJI_LIST_FILE)
     mastered_kanji = load_kanji_list(MASTERED_FILE)
+    
+    # Load custom lists
+    custom_known = load_kanji_list(CUSTOM_KNOWN_FILE)
+    custom_mastered = load_kanji_list(CUSTOM_MASTERED_FILE)
+    
+    # Merge
+    known_kanji.update(custom_known)
+    mastered_kanji.update(custom_mastered)
     
     if not known_kanji:
         print(f"Error: Could not load {KANJI_LIST_FILE}.")

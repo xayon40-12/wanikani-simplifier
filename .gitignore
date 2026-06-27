@@ -1,6 +1,9 @@
 # Novels directory (contains copyrighted raw and simplified texts)
 novels/
 
+# Git Worktree for personal configuration branch
+.configs/
+
 # WaniKani local cache and dynamically fetched list
 subjects_cache.json
 kanji_list.txt

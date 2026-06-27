@@ -40,6 +40,11 @@ This project has **zero external dependencies** and runs out-of-the-box on stand
    python3 --version
    ```
 
+3. **Custom Kanji Lists (Optional)**:
+   If you know kanji from outside WaniKani (e.g., `魔` which is extremely common in fantasy web novels), you can add them to these files:
+   * **`custom_known_kanji.txt`**: Add kanji you know (one per line).
+   * **`custom_mastered_kanji.txt`**: Add kanji you have fully mastered (one per line). Mastered kanji will not be flagged as needing ruby tags.
+
 ---
 
 ## How to Use (Human Workflow)
