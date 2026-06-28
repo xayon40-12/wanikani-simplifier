@@ -39,3 +39,7 @@ When the user asks to "rewrite a novel chapter using only known kanji", follow t
    - Remove any temporary draft files.
    - Run `./init_library_readmes.py` to regenerate the novel library index and link the newly simplified chapter.
    - Report the completion to the user, highlighting the major phrasing choices, synonyms used, and peer-review improvements made.
+
+## Documentation & Rule Integrity
+
+- **Documentation Updates**: Whenever you modify script behaviors, directory layouts, configuration styles, or translation guidelines, you **must** update both `README.md` and this `.agents/AGENTS.md` rule file in the same turn to ensure they remain synchronized with the implementation. Do not wait for the user to prompt you for documentation updates.
