@@ -172,10 +172,91 @@ def download_chapter(domain, ncode, chapter=None, keep_ruby=False):
             for para in paragraphs:
                 f.write(f"{para}\n")
         print(f"Saved chapter text to: {output_filename}")
+        update_readme_indices(ncode, novel_title if novel_title else ncode, novel_folder_name, chapter, title)
         return output_filename
     except Exception as e:
         print(f"Error writing to file: {e}")
         sys.exit(1)
+
+def update_readme_indices(ncode, novel_title, novel_folder_name, chapter, chapter_title):
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    personal_dir = os.path.join(base_dir, "personal")
+    master_readme = os.path.join(personal_dir, "README.md")
+    
+    os.makedirs(personal_dir, exist_ok=True)
+    
+    # 1. Update master README
+    novels_list = []
+    novel_entry = f"- [{novel_title} ({ncode})](./novels/{novel_folder_name}/README.md)"
+    
+    if os.path.exists(master_readme):
+        try:
+            with open(master_readme, "r", encoding="utf-8") as f:
+                content = f.read()
+                novels_list = [line.strip() for line in content.split("\n") if line.strip().startswith("- [")]
+        except Exception as e:
+            print(f"Warning: Could not read master README: {e}")
+            
+    if novel_entry not in novels_list:
+        novels_list.append(novel_entry)
+        novels_list.sort()
+        
+    try:
+        with open(master_readme, "w", encoding="utf-8") as f:
+            f.write("# My Personal Novel Library\n\n")
+            f.write("Table of contents of novels currently downloaded and simplified.\n\n")
+            f.write("## Novels\n")
+            for entry in novels_list:
+                f.write(f"{entry}\n")
+    except Exception as e:
+        print(f"Warning: Could not write master README: {e}")
+        
+    # 2. Update novel README
+    novel_dir = os.path.join(personal_dir, "novels", novel_folder_name)
+    novel_readme = os.path.join(novel_dir, "README.md")
+    
+    os.makedirs(novel_dir, exist_ok=True)
+    
+    chapters_dict = {}
+    
+    if os.path.exists(novel_readme):
+        try:
+            with open(novel_readme, "r", encoding="utf-8") as f:
+                for line in f:
+                    match = re.match(r"^\|\s*Chapter\s+(\d+)\s*\|\s*\[Raw\]\((?P<raw>[^)]+)\)\s*\|\s*(?P<simp>\[Simplified\]\([^)]+\)|N/A)\s*\|\s*(?P<title>.*?)\s*\|$", line.strip())
+                    if match:
+                        ch_num = int(match.group(1))
+                        raw_link = match.group("raw")
+                        simp_link = match.group("simp")
+                        title = match.group("title").strip()
+                        chapters_dict[ch_num] = (raw_link, simp_link, title)
+        except Exception as e:
+            print(f"Warning: Could not parse novel README: {e}")
+            
+    if chapter:
+        try:
+            ch_num = int(chapter)
+            raw_link = f"./raw/{chapter}.md"
+            simp_file = os.path.join(novel_dir, "simplified", f"{chapter}.md")
+            simp_link = f"[Simplified](./simplified/{chapter}.md)" if os.path.exists(simp_file) else "N/A"
+            chapters_dict[ch_num] = (raw_link, simp_link, chapter_title)
+        except ValueError:
+            pass
+            
+    try:
+        with open(novel_readme, "w", encoding="utf-8") as f:
+            f.write(f"# {novel_title} ({ncode})\n\n")
+            url = f"https://ncode.syosetu.com/{ncode}/"
+            f.write(f"- Source: [Syosetu URL]({url})\n\n")
+            f.write("## Chapters\n\n")
+            f.write("| Chapter | Raw Text | Simplified Text | Title |\n")
+            f.write("| --- | --- | --- | --- |\n")
+            for ch_num in sorted(chapters_dict.keys()):
+                raw, simp, title = chapters_dict[ch_num]
+                f.write(f"| Chapter {ch_num} | [Raw]({raw}) | {simp} | {title} |\n")
+    except Exception as e:
+        print(f"Warning: Could not write novel README: {e}")
+
 
 def main():
     if len(sys.argv) < 2:
