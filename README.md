@@ -11,10 +11,14 @@ This project has **zero external dependencies** and runs out-of-the-box on stand
 ```text
 ├── .agents/
 │   └── AGENTS.md            # Automation rules for AI assistants
-├── novels/                  # Local storage for downloaded novel chapters (Git-ignored)
-│   └── {ncode}_{title}/
-│       ├── raw/             # Raw chapters downloaded from Syosetu
-│       └── simplified/      # Rewritten chapters using only known kanji
+├── personal/                # Personal data folder (Git-ignored in main repo)
+│   ├── configs/             # Personal custom kanji lists
+│   │   ├── custom_known_kanji.txt
+│   │   └── custom_mastered_kanji.txt
+│   └── novels/              # Downloaded and simplified novel chapters
+│       └── {ncode}_{title}/
+│           ├── raw/         # Raw chapters downloaded from Syosetu
+│           └── simplified/  # Rewritten chapters using only known kanji
 ├── .gitignore
 ├── README.md
 ├── fetch_kanji.py           # Syncs known kanji from WaniKani API
@@ -40,25 +44,28 @@ This project has **zero external dependencies** and runs out-of-the-box on stand
    python3 --version
    ```
 
-3. **Custom Kanji Lists (Optional)**:
-   To version your personal custom kanji list without cluttering the main branch, this project checks out a separate branch (`personal-configs`) into a git-ignored subfolder `.configs/` using Git worktrees.
-   * **Setup**:
-     Run this command in the project root to set up the worktree:
+3. **Personal Folder & Private Git Setup (Optional but Recommended)**:
+   All your personal configurations, raw novel chapters (copyrighted), and simplified translations are saved inside a single `personal/` folder which is ignored in the main public repository.
+   To back up and sync your progress across multiple devices privately:
+   * **Initialization**:
+     Create the `personal/` directory and initialize it as a separate private Git repository:
      ```bash
-     git worktree add .configs personal-configs
+     mkdir -p personal/configs personal/novels
+     cd personal
+     git init
      ```
-   * **Usage**:
-     Manage your custom lists inside the `.configs/` folder:
-     * **`.configs/custom_known_kanji.txt`**: Add kanji you know from outside WaniKani (one per line).
-     * **`.configs/custom_mastered_kanji.txt`**: Add kanji you have fully mastered (one per line).
-   * **Saving Changes**:
-     To commit and push updates to your personal kanji list, change into the subfolder and commit there:
+   * **Custom lists**:
+     You can place your custom kanji files inside `personal/configs/`:
+     * **`personal/configs/custom_known_kanji.txt`**: Add kanji you know from outside WaniKani (one per line).
+     * **`personal/configs/custom_mastered_kanji.txt`**: Add kanji you have fully mastered (one per line).
+   * **Pushing to a Private Repo**:
+     Set up a private repository on GitHub (or GitLab) and add it as a remote inside `personal/`:
      ```bash
-     cd .configs
-     git add . && git commit -m "Update personal kanji list"
-     git push origin personal-configs
+     git remote add origin git@github.com:yourusername/your-private-repo.git
+     git add . && git commit -m "Initial commit of my translations and configs"
+     git branch -M main
+     git push -u origin main
      ```
-     *(Note: If you do not use the worktree setup, the scripts will fall back to reading `custom_known_kanji.txt` in the root folder).*
 
 ---
 
@@ -71,14 +78,14 @@ To download a chapter from Syosetu.com, use `fetch_syosetu.py`. You can provide 
 # Example: Download Re:Zero Chapter 1
 ./fetch_syosetu.py https://ncode.syosetu.com/n2267be/ 1
 ```
-* **Output Path**: `novels/n2267be_Ｒｅ：ゼロから始める異世界生活/raw/1.md`
+* **Output Path**: `personal/novels/n2267be_Ｒｅ：ゼロから始める異世界生活/raw/1.md`
 * *Tip*: Pass the `--keep-ruby` flag if you want to keep furigana readings formatted as `漢字(かんじ)`. By default, furigana is stripped.
 
 ### Step 2: Validate Against Your Kanji List
 Run the checker script `find_unknown_kanji.py` on the downloaded file. It will automatically update your known kanji list from WaniKani (saving them to `kanji_list.txt`) and scan the file.
 
 ```bash
-./find_unknown_kanji.py novels/n2267be_Ｒｅ：ゼロから始める異世界生活/raw/1.md
+./find_unknown_kanji.py personal/novels/n2267be_Ｒｅ：ゼロから始める異世界生活/raw/1.md
 ```
 * **Output**: A list of all unknown kanji characters found in the text, indicating their exact line and character column numbers.
 
@@ -89,7 +96,7 @@ Write your simplified chapter and save it under the `simplified/` folder.
 
 Verify the rewritten file:
 ```bash
-./find_unknown_kanji.py novels/n2267be_Ｒｅ：ゼロから始める異世界生活/simplified/1.md
+./find_unknown_kanji.py personal/novels/n2267be_Ｒｅ：ゼロから始める異世界生活/simplified/1.md
 ```
 Repeat until it reports **`0 unknown kanji`**!
 
@@ -110,7 +117,7 @@ The AI assistant will automatically read the instructions in **[.agents/AGENTS.m
 5. Run `./find_unknown_kanji.py` to identify remaining issues.
 6. Correct the text and re-validate until it reaches `0 unknown kanji`.
 7. Run a **self-peer-review** to restore key quotes in kana or optimize flow.
-8. Save the finalized file to `novels/{ncode}_{title}/simplified/{chapter}.md`.
+8. Save the finalized file to `personal/novels/{ncode}_{title}/simplified/{chapter}.md`.
 
 ---
 

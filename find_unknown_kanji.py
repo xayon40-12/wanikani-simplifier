@@ -9,9 +9,9 @@ KANJI_LIST_FILE = "kanji_list.txt"
 MASTERED_FILE = "mastered_kanji.txt"
 FETCH_KANJI_SCRIPT = "fetch_kanji.py"
 
-# Search paths for custom files (prefers .configs/ worktree folder, falls back to root)
-CUSTOM_KNOWN_PATHS = [".configs/custom_known_kanji.txt", "custom_known_kanji.txt"]
-CUSTOM_MASTERED_PATHS = [".configs/custom_mastered_kanji.txt", "custom_mastered_kanji.txt"]
+# Search paths for custom files (prefers personal/configs/ folder, falls back to old paths)
+CUSTOM_KNOWN_PATHS = ["personal/configs/custom_known_kanji.txt", ".configs/custom_known_kanji.txt", "custom_known_kanji.txt"]
+CUSTOM_MASTERED_PATHS = ["personal/configs/custom_mastered_kanji.txt", ".configs/custom_mastered_kanji.txt", "custom_mastered_kanji.txt"]
 
 def update_kanji_list():
     print("Updating known kanji list from WaniKani...")

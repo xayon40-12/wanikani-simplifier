@@ -1,8 +1,5 @@
-# Novels directory (contains copyrighted raw and simplified texts)
-novels/
-
-# Git Worktree for personal configuration branch
-.configs/
+# Personal directory (contains private configs, raw and simplified texts)
+/personal/
 
 # WaniKani local cache and dynamically fetched list
 subjects_cache.json

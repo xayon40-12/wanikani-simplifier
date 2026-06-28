@@ -151,11 +151,11 @@ def download_chapter(domain, ncode, chapter=None, keep_ruby=False):
             novel_folder_name = f"{ncode}_{sanitized_title}"
             
     if chapter:
-        output_dir = os.path.join("novels", novel_folder_name, "raw")
+        output_dir = os.path.join("personal", "novels", novel_folder_name, "raw")
         os.makedirs(output_dir, exist_ok=True)
         output_filename = os.path.join(output_dir, f"{chapter}.md")
     else:
-        output_dir = os.path.join("novels", novel_folder_name)
+        output_dir = os.path.join("personal", "novels", novel_folder_name)
         os.makedirs(output_dir, exist_ok=True)
         output_filename = os.path.join(output_dir, "main.md")
         
