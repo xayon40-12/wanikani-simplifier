@@ -37,4 +37,5 @@ When the user asks to "rewrite a novel chapter using only known kanji", follow t
 5. **Saving the Final Chapter**:
    - Move or save the verified clean text to `personal/novels/{ncode}_{title}/simplified/{chapter}.md`.
    - Remove any temporary draft files.
+   - Run `./init_library_readmes.py` to regenerate the novel library index and link the newly simplified chapter.
    - Report the completion to the user, highlighting the major phrasing choices, synonyms used, and peer-review improvements made.

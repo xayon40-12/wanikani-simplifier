@@ -139,3 +139,15 @@ Downloads novel pages. Supports `novel18.syosetu.com` (Nocturne/R18) by automati
 ```bash
 ./fetch_syosetu.py <ncode_or_url> [chapter] [--keep-ruby]
 ```
+
+### `find_unknown_kanji.py`
+Validates a text file against your known kanji list (fetched from WaniKani + custom lists) and checks that all unmastered known kanji have proper Hiragana `<ruby>` tags.
+```bash
+./find_unknown_kanji.py <target_file>
+```
+
+### `init_library_readmes.py`
+Scans your `personal/novels/` folder to generate or regenerate the wiki index files (`personal/README.md` and `personal/novels/{novel}/README.md`). Use this to rebuild the index tables manually if needed.
+```bash
+./init_library_readmes.py
+```
