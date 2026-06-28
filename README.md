@@ -84,8 +84,8 @@ Run the checker script `find_unknown_kanji.py` on the downloaded file. It will a
 
 ### Step 3: Rewrite and Simplify
 Write your simplified chapter and save it under the `simplified/` folder.
-* **Grammar & Verbs**: Rephrase sentences naturally using synonyms containing **known kanji** (do not simply replace unknown kanji with Hiragana, as it makes vocabulary hard to parse).
-* **Nouns & Names**: If you want to keep proper names, titles, or specific nouns recognizable, replace their unknown kanji with **Katakana** (e.g., `ヤカギ水明`, `ハクシャク`). Katakana instantly signals that it is a noun rather than Japanese grammar.
+* **Grammar, Verbs, & Common Nouns**: Rephrase sentences naturally using synonyms containing **known kanji** (e.g., rewrite `伯爵` to `身分の高い家` or `炎` to `火`). Do not simply replace unknown kanji with Hiragana, as it makes vocabulary hard to parse.
+* **Proper Nouns & Names**: If you want to keep proper names (like people's names, e.g., `八鍵`, or place names containing unknown kanji) recognizable, keep their original kanji and wrap them in **Katakana ruby tags** (e.g., `<ruby>八鍵<rt>ヤカギ</rt></ruby>`).
 
 Verify the rewritten file:
 ```bash
