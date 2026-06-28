@@ -19,6 +19,7 @@ When the user asks to "rewrite a novel chapter using only known kanji", follow t
    - Draft a rewritten version of the text.
    - **Constraint**: You must *only* use kanji characters present in `kanji_list.txt`.
    - **Constraint**: Do not simply replace unknown kanji with Hiragana unless the word is typically/normally written in Hiragana. Instead, rewrite the sentences naturally, using vocabulary and synonyms that consist of known kanji (e.g. rewrite `叫び声` to `大きな声`, or `一瞬` to `短い時間`). Maintain the original grammar, meaning, and dramatic tone as closely as possible.
+   - **Proper Nouns & Kept Nouns**: To keep proper names, titles (like `伯爵`, `貴族`), or specific nouns recognizable, replace their unknown kanji with Katakana (e.g. `ヤカギ水明`, `ハクシャク`). Avoid Hiragana for these kept nouns, as Katakana immediately tells the reader it is a noun/word rather than Japanese grammar.
    - **Furigana / Ruby formatting**: Any kanji used in the simplified draft that is present in `kanji_list.txt` but **NOT** present in `mastered_kanji.txt` (meaning it is Apprentice 3, 4, or Guru 1, but not yet Guru 2) **must** be formatted with HTML ruby tags: `<ruby>漢字<rt>かんじ</rt></ruby>`. For compound words, apply the ruby tags specifically to the non-mastered kanji characters (e.g. `地<ruby>面<rt>めん</rt></ruby>`).
    - Write the draft to a temporary file, e.g., `novels/{ncode}_{title}/simplified/{chapter}_draft.md`.
    - Run `./find_unknown_kanji.py novels/{ncode}_{title}/simplified/{chapter}_draft.md`.

@@ -83,7 +83,9 @@ Run the checker script `find_unknown_kanji.py` on the downloaded file. It will a
 * **Output**: A list of all unknown kanji characters found in the text, indicating their exact line and character column numbers.
 
 ### Step 3: Rewrite and Simplify
-Write your simplified chapter and save it under the `simplified/` folder. Use synonyms, descriptive phrases, or native hiragana spellings to avoid any kanji not on your known list.
+Write your simplified chapter and save it under the `simplified/` folder.
+* **Grammar & Verbs**: Rephrase sentences naturally using synonyms containing **known kanji** (do not simply replace unknown kanji with Hiragana, as it makes vocabulary hard to parse).
+* **Nouns & Names**: If you want to keep proper names, titles, or specific nouns recognizable, replace their unknown kanji with **Katakana** (e.g., `ヤカギ水明`, `ハクシャク`). Katakana instantly signals that it is a noun rather than Japanese grammar.
 
 Verify the rewritten file:
 ```bash

@@ -52,6 +52,10 @@ def is_kanji(char):
     # Standard Japanese Kanji range (CJK Unified Ideographs)
     return '\u4e00' <= char <= '\u9fff'
 
+def is_katakana(text):
+    # Matches Katakana range (\u30a0-\u30ff), prolonged sound mark (ー), and spaces
+    return all('\u30a0' <= c <= '\u30ff' or c in ['ー', ' ', '　', '・'] for c in text)
+
 def offset_to_line_col(content, offset):
     before = content[:offset]
     lines = before.split("\n")
@@ -78,13 +82,22 @@ def analyze_file(filepath, known_kanji, mastered_kanji):
         start, end = match.span()
         ruby_intervals.append((start, end))
         kanji_str = match.group("kanji")
+        reading_str = match.group("reading")
         
-        # Check if the kanji inside the ruby block are known at all
+        # Katakana reading allows unknown kanji (kept nouns/proper names)
+        is_noun_kept = is_katakana(reading_str)
+        
+        # Check if the kanji inside the ruby block are known
         for char in kanji_str:
-            if is_kanji(char) and char not in known_kanji:
-                char_offset = start + content[start:end].find(char)
-                line, col = offset_to_line_col(content, char_offset)
-                errors.append((line, col, char, "Unknown kanji inside ruby tag"))
+            if is_kanji(char):
+                if is_noun_kept:
+                    # Allowed: Kept unknown/known noun with Katakana ruby
+                    continue
+                elif char not in known_kanji:
+                    # Forbidden: Unknown kanji inside standard Hiragana ruby
+                    char_offset = start + content[start:end].find(char)
+                    line, col = offset_to_line_col(content, char_offset)
+                    errors.append((line, col, char, "Unknown kanji inside standard Hiragana ruby tag"))
 
     def is_inside_ruby(offset):
         for start, end in ruby_intervals:
